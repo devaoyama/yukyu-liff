@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import Container from "@material-ui/core/Container";
 import TextField from "@material-ui/core/TextField";
 import makeStyles from "@material-ui/core/styles/makeStyles";
@@ -7,6 +7,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
+import {Controller, useForm} from "react-hook-form";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -23,38 +24,32 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+type TInput = {
+    date: string
+    days: string | undefined
+    reason: string
+}
+
 const Application = () => {
-    const [date, setDate] = useState('');
-
-    const [days, setDays] = useState(null);
-
-    const [reason, setReason] = useState('');
-
-    const [isSubmitted, setSubmitted] = useState(false);
+    const { register, handleSubmit, formState, control } = useForm<TInput>();
 
     const classes = useStyles();
 
-    const handleClick = () => {
+    const handleClick = handleSubmit(async (input) => {
+        console.log(input)
         if (window.confirm('有給申請しますか？')) {
             console.log('ok');
-            setSubmitted(true);
         }
-    }
-
-    if (isSubmitted) {
-        return (
-            <div>送信完了</div>
-        )
-    }
+    });
 
     return (
         <Container maxWidth="sm">
             <div className={classes.paper}>
                 <TextField
                     label="有給日"
+                    name="date"
                     type="date"
-                    value={date}
-                    onChange={event => setDate(event.target.value)}
+                    inputRef={register}
                     InputLabelProps={{
                         shrink: true,
                     }}
@@ -62,21 +57,26 @@ const Application = () => {
                 />
                 <FormControl className={classes.form} fullWidth>
                     <InputLabel id="demo-simple-select-label">日数</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={days}
-                        onChange={event => setDays(event.target.value)}
-                    >
-                        <MenuItem value={1}>半日</MenuItem>
-                        <MenuItem value={2}>1日</MenuItem>
-                    </Select>
+                    <Controller
+                        control={control}
+                        name="days"
+                        defaultValue={"all"}
+                        as={
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                            >
+                                <MenuItem value="half">半日</MenuItem>
+                                <MenuItem value="all">1日</MenuItem>
+                            </Select>
+                        }
+                    />
                 </FormControl>
                 <TextField
-                    type="text"
                     label="理由"
-                    value={reason}
-                    onChange={event => setReason(event.target.value)}
+                    name="reason"
+                    type="text"
+                    inputRef={register}
                     className={classes.form}
                     fullWidth
                     multiline
@@ -89,6 +89,7 @@ const Application = () => {
                     type="button"
                     className={classes.submit}
                     onClick={handleClick}
+                    disabled={formState.isSubmitting}
                     fullWidth
                     variant="contained"
                     color="primary"
