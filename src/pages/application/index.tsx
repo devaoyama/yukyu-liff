@@ -30,7 +30,7 @@ type TInput = {
     reason: string
 }
 
-const Application = () => {
+const Index = () => {
     const { register, handleSubmit, formState, control } = useForm<TInput>();
 
     const classes = useStyles();
@@ -60,7 +60,7 @@ const Application = () => {
                     <Controller
                         control={control}
                         name="days"
-                        defaultValue={"all"}
+                        defaultValue={"half"}
                         as={
                             <Select
                                 labelId="demo-simple-select-label"
@@ -101,4 +101,4 @@ const Application = () => {
     )
 }
 
-export default Application;
+export default Index;
