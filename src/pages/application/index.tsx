@@ -32,7 +32,7 @@ type TInput = {
 }
 
 const Index = () => {
-    const { register, handleSubmit, formState, control } = useForm<TInput>();
+    const { register, errors, handleSubmit, formState, control } = useForm<TInput>();
 
     const router = useRouter();
 
@@ -52,11 +52,15 @@ const Index = () => {
                     label="有給日"
                     name="date"
                     type="date"
-                    inputRef={register}
+                    inputRef={register({
+                        required: { value: true, message: "日付を選択してください" },
+                    })}
                     InputLabelProps={{
                         shrink: true,
                     }}
                     fullWidth
+                    error={!!errors.date}
+                    helperText={errors.date?.message}
                 />
                 <FormControl className={classes.form} fullWidth>
                     <InputLabel id="demo-simple-select-label">日数</InputLabel>
@@ -79,7 +83,9 @@ const Index = () => {
                     label="理由"
                     name="reason"
                     type="text"
-                    inputRef={register}
+                    inputRef={register({
+                        required: { value: true, message: "理由を入力してください" },
+                    })}
                     className={classes.form}
                     fullWidth
                     multiline
@@ -87,6 +93,8 @@ const Index = () => {
                     InputLabelProps={{
                         shrink: true,
                     }}
+                    error={!!errors.reason}
+                    helperText={errors.reason?.message}
                 />
                 <Button
                     type="button"
