@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import Container from "@material-ui/core/Container";
 import TextField from "@material-ui/core/TextField";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
+import Alert from "@material-ui/lab/Alert";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import {Controller, useForm} from "react-hook-form";
@@ -16,6 +17,9 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+    },
+    alert: {
+        marginBottom: theme.spacing(5)
     },
     form: {
         margin: theme.spacing(3),
@@ -32,15 +36,30 @@ type TInput = {
 }
 
 const Index = () => {
+    const [error, setError] = useState(false);
+
     const { register, errors, handleSubmit, formState, control } = useForm<TInput>();
 
     const router = useRouter();
 
     const classes = useStyles();
 
-    const handleClick = handleSubmit(async (input) => {
-        console.log(input)
+    const handleClick = handleSubmit(async ({ date, days, reason }) => {
         if (window.confirm('有給申請しますか？')) {
+            const body = {
+                idToken: liff.getIDToken(),
+                date,
+                days,
+                reason,
+            };
+            const response = await fetch(process.env.GAS_URL, {
+                method: "post",
+                body: JSON.stringify(body)
+            });
+            if (await response.text() !== 'ok') {
+                setError(true);
+                return;
+            }
             await router.push('/application/complete');
         }
     });
@@ -48,6 +67,12 @@ const Index = () => {
     return (
         <Container maxWidth="sm">
             <div className={classes.paper}>
+                {error && (
+                    <Alert severity="error" className={classes.alert}>
+                        エラーが発生しました。もう一度やり直してください
+                    </Alert>
+                )}
+
                 <TextField
                     label="有給日"
                     name="date"
@@ -67,14 +92,14 @@ const Index = () => {
                     <Controller
                         control={control}
                         name="days"
-                        defaultValue={"half"}
+                        defaultValue={"半日"}
                         as={
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                             >
-                                <MenuItem value="half">半日</MenuItem>
-                                <MenuItem value="all">1日</MenuItem>
+                                <MenuItem value="半日">半日</MenuItem>
+                                <MenuItem value="1日">1日</MenuItem>
                             </Select>
                         }
                     />
