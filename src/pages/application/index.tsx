@@ -10,6 +10,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import {Controller, useForm} from "react-hook-form";
 import {useRouter} from "next/router";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -66,6 +67,7 @@ const Index = () => {
 
     return (
         <Container maxWidth="sm">
+            <LoadingOverlay status={formState.isSubmitting} />
             <div className={classes.paper}>
                 {error && (
                     <Alert severity="error" className={classes.alert}>
